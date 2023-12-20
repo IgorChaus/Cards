@@ -61,6 +61,7 @@ class GameSceneScreen: Fragment() {
             launchEndGamePopupScreen(it)
         }
 
+        binding.rv.overScrollMode = View.OVER_SCROLL_NEVER
         binding.rv.adapter = adapter
         viewModel.startCounter()
 

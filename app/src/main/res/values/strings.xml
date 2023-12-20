@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Cards</string>
+    <string name="congratulations">CONGRATULATIONS</string>
+    <string name="great_you_won">Great! You won!</string>
+    <string name="double_reward">Double Reward</string>
+    <string name="less_time_more_rewards">less time more rewards</string>
+    <string name="rules">Keep matching up two the same object until there are no more to be paired and you clear the board</string>
+    <string name="fast">fast</string>
+    <string name="play">Play</string>
 </resources>

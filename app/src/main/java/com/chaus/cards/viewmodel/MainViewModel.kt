@@ -15,14 +15,14 @@ class MainViewModel(coins: Int): ViewModel() {
     private var itemList = arrayListOf(
         Item(image = R.drawable.diamond_1),
         Item(image = R.drawable.diamond_2),
-//        Item(image = R.drawable.diamond_3),
-//        Item(image = R.drawable.diamond_4),
-//        Item(image = R.drawable.diamond_5),
-//        Item(image = R.drawable.diamond_6),
-//        Item(image = R.drawable.diamond_7),
-//        Item(image = R.drawable.diamond_8),
-//        Item(image = R.drawable.diamond_9),
-//        Item(image = R.drawable.diamond_10),
+        Item(image = R.drawable.diamond_3),
+        Item(image = R.drawable.diamond_4),
+        Item(image = R.drawable.diamond_5),
+        Item(image = R.drawable.diamond_6),
+        Item(image = R.drawable.diamond_7),
+        Item(image = R.drawable.diamond_8),
+        Item(image = R.drawable.diamond_9),
+        Item(image = R.drawable.diamond_10)
     )
 
 
