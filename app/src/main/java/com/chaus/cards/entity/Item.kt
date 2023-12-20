@@ -1,4 +1,4 @@
-package com.chaus.cards
+package com.chaus.cards.entity
 
 data class Item(
     val image: Int,

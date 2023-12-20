@@ -1,14 +1,22 @@
-package com.chaus.cards
+package com.chaus.cards.view
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.chaus.cards.entity.Item
 import com.chaus.cards.databinding.ItemBinding
 
-class ItemAdapter(): RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
+class ItemAdapter: RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
     var items = listOf<Item>()
+        @SuppressLint("NotifyDataSetChanged")
+        set(value) {
+          field = value
+            notifyDataSetChanged()
+        }
+
     var clickListener: ((Int) -> Unit)? = null
 
     class ItemViewHolder(val binding: ItemBinding): RecyclerView.ViewHolder(binding.root)
@@ -25,6 +33,7 @@ class ItemAdapter(): RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
         holder.binding.imageView.setImageResource(item.image)
         if(item.visibility){
             holder.binding.imageView.visibility = View.VISIBLE
+            holder.binding.item.setOnClickListener(null)
         } else {
             holder.binding.imageView.visibility = View.INVISIBLE
             holder.binding.item.setOnClickListener {
