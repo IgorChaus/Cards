@@ -40,13 +40,15 @@ class GameSceneScreen: Fragment() {
         val factory = MainViewModelFactory(numberCoins)
         val viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         val adapter = ItemAdapter()
+        adapter.items = viewModel.itemList
 
         adapter.clickListener = {
             viewModel.checkItem(it)
         }
 
-        viewModel.items.observe(viewLifecycleOwner){
-            adapter.items = it
+        viewModel.item.observe(viewLifecycleOwner){
+            adapter.items = viewModel.itemList
+            adapter.notifyItemChanged(it)
         }
 
         viewModel.counter.observe(viewLifecycleOwner){

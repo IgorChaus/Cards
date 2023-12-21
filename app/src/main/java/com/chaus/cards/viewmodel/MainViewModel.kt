@@ -11,7 +11,7 @@ import kotlin.math.max
 
 class MainViewModel(coins: Int): ViewModel() {
 
-    private var itemList = arrayListOf(
+    var itemList = arrayListOf(
         Item(image = R.drawable.diamond_1),
         Item(image = R.drawable.diamond_2),
         Item(image = R.drawable.diamond_3),
@@ -25,9 +25,9 @@ class MainViewModel(coins: Int): ViewModel() {
     )
 
 
-    private val _items: MutableLiveData<List<Item>> = MutableLiveData()
-    val items: LiveData<List<Item>>
-        get() = _items
+    private val _item: MutableLiveData<Int> = MutableLiveData()
+    val item: LiveData<Int>
+        get() = _item
 
     private val _counter: MutableLiveData<Int> = MutableLiveData(0)
     val counter: LiveData<Int>
@@ -52,10 +52,10 @@ class MainViewModel(coins: Int): ViewModel() {
     private var firstPressedIndexItem: Int? = null
     private var currentItem: Item? = null
 
+
     init{
         itemList.addAll(itemList)
         itemList.shuffle()
-        _items.value = itemList
     }
 
     fun startCounter() {
@@ -81,32 +81,34 @@ class MainViewModel(coins: Int): ViewModel() {
     fun checkItem(indexItem: Int) {
         if (currentItem != null) return
         viewModelScope.launch {
-            val copyItems = items.value as ArrayList<Item>
-            currentItem = copyItems[indexItem]
-            copyItems[indexItem] = currentItem!!.copy(visibility = true)
-            _items.value = copyItems
-
+            currentItem = itemList[indexItem].copy(visibility = true)
+            itemList[indexItem] = currentItem!!
+            _item.value = indexItem
             if (firstPressedIndexItem == null) {
                 firstPressedIndexItem = indexItem
                 currentItem = null
             } else {
-                if (copyItems[firstPressedIndexItem!!].image != copyItems[indexItem].image) {
+                if (itemList[firstPressedIndexItem!!].image != itemList[indexItem].image) {
                     delay(300)
-                    copyItems[indexItem] = currentItem!!.copy(visibility = false)
+                    itemList[indexItem] = currentItem!!.copy(visibility = false)
+                    _item.value = indexItem
 
-                    val firstItem = copyItems[firstPressedIndexItem!!]
-                    copyItems[firstPressedIndexItem!!] = firstItem.copy(visibility = false)
-
-                    _items.value = copyItems
+                    val firstItem = itemList[firstPressedIndexItem!!]
+                    itemList[firstPressedIndexItem!!] = firstItem.copy(visibility = false)
+                    _item.value = firstPressedIndexItem
                 }
                 firstPressedIndexItem = null
                 currentItem = null
-                val hideItem = copyItems.find{ !it.visibility }
-                if (hideItem == null){
-                    _gameResult.value = coin.value
-                    clearCounter()
-                }
+                checkItemsVisibility()
             }
+        }
+    }
+
+    private fun checkItemsVisibility() {
+        val hideItem = itemList.find { !it.visibility }
+        if (hideItem == null) {
+            _gameResult.value = coin.value
+            clearCounter()
         }
     }
 

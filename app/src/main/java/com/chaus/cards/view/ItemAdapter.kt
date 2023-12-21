@@ -1,22 +1,15 @@
 package com.chaus.cards.view
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.chaus.cards.entity.Item
 import com.chaus.cards.databinding.ItemBinding
+import com.chaus.cards.entity.Item
 
 class ItemAdapter: RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
     var items = listOf<Item>()
-        @SuppressLint("NotifyDataSetChanged")
-        set(value) {
-          field = value
-            notifyDataSetChanged()
-        }
-
     var clickListener: ((Int) -> Unit)? = null
 
     class ItemViewHolder(val binding: ItemBinding): RecyclerView.ViewHolder(binding.root)
