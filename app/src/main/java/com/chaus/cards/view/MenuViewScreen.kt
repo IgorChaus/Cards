@@ -15,6 +15,7 @@ class MenuViewScreen: Fragment() {
     private val binding: MenuViewScreenBinding
         get() = _binding ?: throw RuntimeException("MenuViewScreenBinding == null")
 
+    private val gameSettings = GameSettings(NUMBER_COINS, NUMBER_ROWS)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,16 +28,15 @@ class MenuViewScreen: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val gameSettings = GameSettings()
         binding.tvCoins.text = gameSettings.numberCoins.toString()
         binding.btPlay.setOnClickListener {
-            launchGameSceneScreen(gameSettings.numberCoins)
+            launchGameSceneScreen()
         }
     }
 
-    private fun launchGameSceneScreen(coins: Int){
+    private fun launchGameSceneScreen(){
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.container_activity, GameSceneScreen.getInstance(coins))
+            .replace(R.id.container_activity, GameSceneScreen.getInstance(gameSettings))
             .commit()
     }
 
@@ -47,6 +47,8 @@ class MenuViewScreen: Fragment() {
 
     companion object{
         fun getInstance() = MenuViewScreen()
+        const val NUMBER_COINS = 100
+        const val NUMBER_ROWS = 5
     }
 
 }

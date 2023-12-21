@@ -1,5 +1,6 @@
 package com.chaus.cards.view
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.chaus.cards.*
 import com.chaus.cards.databinding.GameSceneScreenBinding
+import com.chaus.cards.entity.GameResult
+import com.chaus.cards.entity.GameSettings
 import com.chaus.cards.viewmodel.MainViewModel
 import com.chaus.cards.viewmodel.MainViewModelFactory
 
@@ -17,6 +20,8 @@ class GameSceneScreen: Fragment() {
     private var _binding: GameSceneScreenBinding? = null
     private val binding: GameSceneScreenBinding
         get() = _binding ?: throw RuntimeException("GameSceneScreenBinding == null")
+
+    private var gameSettings = GameSettings()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,8 +41,8 @@ class GameSceneScreen: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val numberCoins = requireArguments().getInt(KEY_COINS)
-        val factory = MainViewModelFactory(numberCoins)
+        parsArgs()
+        val factory = MainViewModelFactory(gameSettings)
         val viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         val adapter = ItemAdapter()
         adapter.items = viewModel.itemList
@@ -65,13 +70,25 @@ class GameSceneScreen: Fragment() {
 
         binding.rv.overScrollMode = View.OVER_SCROLL_NEVER
         binding.rv.adapter = adapter
-        viewModel.startCounter()
 
     }
 
-    private fun launchEndGamePopupScreen(numberCoins: Int){
+    private fun parsArgs() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireArguments().getParcelable(KEY_SETTINGS, GameSettings::class.java)?.let {
+                gameSettings = it
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            requireArguments().getParcelable<GameSettings>(KEY_SETTINGS)?.let {
+                gameSettings = it
+            }
+        }
+    }
+
+    private fun launchEndGamePopupScreen(gameResult: GameResult){
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.container_activity, EndGamePopupScreen.getInstance(numberCoins))
+            .replace(R.id.container_activity, EndGamePopupScreen.getInstance(gameResult, gameSettings))
             .commit()
     }
 
@@ -82,13 +99,13 @@ class GameSceneScreen: Fragment() {
     }
 
     companion object{
-        fun getInstance(numberCoins: Int): Fragment{
+        fun getInstance(gameSettings: GameSettings): Fragment{
             return GameSceneScreen().apply {
                 arguments = Bundle().apply {
-                    putInt(KEY_COINS,numberCoins)
+                    putParcelable(KEY_SETTINGS, gameSettings)
                 }
             }
         }
-        private const val KEY_COINS = "numberCoins"
+        private const val KEY_SETTINGS = "gameSettings"
     }
 }

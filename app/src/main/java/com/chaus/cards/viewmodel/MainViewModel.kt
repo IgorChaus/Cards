@@ -2,28 +2,20 @@ package com.chaus.cards.viewmodel
 
 
 import androidx.lifecycle.*
-import com.chaus.cards.R
+import com.chaus.cards.data.GameRepositoryImpl
+import com.chaus.cards.entity.GameResult
+import com.chaus.cards.entity.GameSettings
 import com.chaus.cards.entity.Item
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.math.max
 
-class MainViewModel(coins: Int): ViewModel() {
+class MainViewModel(gameSettings: GameSettings): ViewModel() {
 
-    var itemList = arrayListOf(
-        Item(image = R.drawable.diamond_1),
-        Item(image = R.drawable.diamond_2),
-        Item(image = R.drawable.diamond_3),
-        Item(image = R.drawable.diamond_4),
-        Item(image = R.drawable.diamond_5),
-        Item(image = R.drawable.diamond_6),
-        Item(image = R.drawable.diamond_7),
-        Item(image = R.drawable.diamond_8),
-        Item(image = R.drawable.diamond_9),
-        Item(image = R.drawable.diamond_10)
-    )
+    private val repository = GameRepositoryImpl()
 
+    var itemList: ArrayList<Item> = repository.generateCards(gameSettings.numberColumns) as ArrayList<Item>
 
     private val _item: MutableLiveData<Int> = MutableLiveData()
     val item: LiveData<Int>
@@ -33,16 +25,16 @@ class MainViewModel(coins: Int): ViewModel() {
     val counter: LiveData<Int>
         get() = _counter
 
-    private val _gameResult = MutableLiveData<Int>()
-    val gameResult: LiveData<Int>
+    private val _gameResult = MutableLiveData<GameResult>()
+    val gameResult: LiveData<GameResult>
         get() = _gameResult
 
     val coin = MediatorLiveData<Int>().apply {
         addSource(counter) {
             value = if (it <= 20){
-                coins
+                gameSettings.numberCoins
             } else {
-                max(coins - (it - 20) * 5, 10)
+                max(gameSettings.numberCoins - (it - 20) * 5, 10)
             }
         }
     }
@@ -54,11 +46,10 @@ class MainViewModel(coins: Int): ViewModel() {
 
 
     init{
-        itemList.addAll(itemList)
-        itemList.shuffle()
+        startCounter()
     }
 
-    fun startCounter() {
+    private fun startCounter() {
         timer = Timer()
         timer?.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
@@ -107,7 +98,7 @@ class MainViewModel(coins: Int): ViewModel() {
     private fun checkItemsVisibility() {
         val hideItem = itemList.find { !it.visibility }
         if (hideItem == null) {
-            _gameResult.value = coin.value
+            _gameResult.value = GameResult(counter.value, coin.value)
             clearCounter()
         }
     }

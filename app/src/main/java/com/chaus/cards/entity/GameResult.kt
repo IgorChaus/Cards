@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class GameSettings(
-    val numberCoins: Int = 100,
-    val numberColumns: Int = 5,
+data class GameResult(
+    val time: Int?,
+    val numberCoins: Int?
 ): Parcelable
