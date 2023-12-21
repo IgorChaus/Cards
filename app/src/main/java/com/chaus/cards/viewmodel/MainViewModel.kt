@@ -2,12 +2,11 @@ package com.chaus.cards.viewmodel
 
 
 import androidx.lifecycle.*
-import com.chaus.cards.entity.Item
 import com.chaus.cards.R
+import com.chaus.cards.entity.Item
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.max
 
 class MainViewModel(coins: Int): ViewModel() {
@@ -50,13 +49,14 @@ class MainViewModel(coins: Int): ViewModel() {
 
     private var timer: Timer? = null
 
+    private var firstPressedIndexItem: Int? = null
+    private var currentItem: Item? = null
+
     init{
         itemList.addAll(itemList)
         itemList.shuffle()
         _items.value = itemList
     }
-
-    private var firstPressedIndexItem: Int? = null
 
     fun startCounter() {
         timer = Timer()
@@ -79,18 +79,20 @@ class MainViewModel(coins: Int): ViewModel() {
     }
 
     fun checkItem(indexItem: Int) {
+        if (currentItem != null) return
         viewModelScope.launch {
             val copyItems = items.value as ArrayList<Item>
-            val item = copyItems[indexItem]
-            copyItems[indexItem] = item.copy(visibility = true)
+            currentItem = copyItems[indexItem]
+            copyItems[indexItem] = currentItem!!.copy(visibility = true)
             _items.value = copyItems
 
             if (firstPressedIndexItem == null) {
                 firstPressedIndexItem = indexItem
+                currentItem = null
             } else {
                 if (copyItems[firstPressedIndexItem!!].image != copyItems[indexItem].image) {
                     delay(300)
-                    copyItems[indexItem] = item.copy(visibility = false)
+                    copyItems[indexItem] = currentItem!!.copy(visibility = false)
 
                     val firstItem = copyItems[firstPressedIndexItem!!]
                     copyItems[firstPressedIndexItem!!] = firstItem.copy(visibility = false)
@@ -98,6 +100,7 @@ class MainViewModel(coins: Int): ViewModel() {
                     _items.value = copyItems
                 }
                 firstPressedIndexItem = null
+                currentItem = null
                 val hideItem = copyItems.find{ !it.visibility }
                 if (hideItem == null){
                     _gameResult.value = coin.value
