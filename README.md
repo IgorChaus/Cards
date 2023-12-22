@@ -17,5 +17,5 @@
 
 ## Dynamic presentation 1
 <p>
-    <img src="https://github.com/IgorChaus/Hotel/assets/95531383/39a0b24b-5fa3-4c3e-96a3-310fb36eac38" height="350" hspace="10" >
+    <img src="https://github.com/IgorChaus/Cards/assets/95531383/b77bb38c-e515-48a5-bac3-fbece4a98e12" height="350" hspace="10" >
 </p>
