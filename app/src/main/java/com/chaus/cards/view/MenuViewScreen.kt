@@ -1,7 +1,6 @@
 package com.chaus.cards.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +23,6 @@ class MenuViewScreen: Fragment() {
         savedInstanceState: Bundle?): View {
 
         _binding = MenuViewScreenBinding.inflate(inflater, container, false)
-        Log.i("MyTag", "MenuViewScreen onViewCreated")
         return binding.root
 
     }
@@ -45,12 +43,6 @@ class MenuViewScreen: Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        Log.i("MyTag", "MenuViewScreen onDestroyView")
-    }
-
-    override fun onDestroy() {
-        Log.i("MyTag", "MenuViewScreen onDestroy")
-        super.onDestroy()
     }
 
     companion object{
