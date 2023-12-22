@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/menuViewScreen">
+
+    <fragment
+        android:id="@+id/menuViewScreen"
+        android:name="com.chaus.cards.view.MenuViewScreen"
+        android:label="menu_view_screen"
+        tools:layout="@layout/menu_view_screen" >
+        <action
+            android:id="@+id/action_menuViewScreen_to_gameSceneScreen"
+            app:destination="@id/gameSceneScreen"
+            app:popUpTo="@id/menuViewScreen" />
+        <argument
+            android:name="gameSettings"
+            app:argType="com.chaus.cards.entity.GameSettings" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameSceneScreen"
+        android:name="com.chaus.cards.view.GameSceneScreen"
+        android:label="game_scene_screen"
+        tools:layout="@layout/game_scene_screen" >
+        <action
+            android:id="@+id/action_gameSceneScreen_to_endGamePopupScreen"
+            app:destination="@id/endGamePopupScreen"
+            app:popUpTo="@id/menuViewScreen"
+            app:popUpToInclusive="false" />
+        <argument
+            android:name="gameSettings"
+            app:argType="com.chaus.cards.entity.GameSettings" />
+    </fragment>
+    <fragment
+        android:id="@+id/endGamePopupScreen"
+        android:name="com.chaus.cards.view.EndGamePopupScreen"
+        android:label="end_game_popup_screen"
+        tools:layout="@layout/end_game_popup_screen" >
+        <argument
+            android:name="gameResult"
+            app:argType="com.chaus.cards.entity.GameResult" />
+        <argument
+            android:name="gameSettings"
+            app:argType="com.chaus.cards.entity.GameSettings" />
+        <action
+            android:id="@+id/action_endGamePopupScreen_to_gameSceneScreen"
+            app:destination="@id/gameSceneScreen"
+            app:popUpTo="@id/menuViewScreen" />
+    </fragment>
+</navigation>

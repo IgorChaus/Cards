@@ -1,11 +1,12 @@
 package com.chaus.cards.view
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.chaus.cards.R
+import androidx.navigation.fragment.findNavController
 import com.chaus.cards.databinding.MenuViewScreenBinding
 import com.chaus.cards.entity.GameSettings
 
@@ -23,7 +24,9 @@ class MenuViewScreen: Fragment() {
         savedInstanceState: Bundle?): View {
 
         _binding = MenuViewScreenBinding.inflate(inflater, container, false)
+        Log.i("MyTag", "MenuViewScreen onViewCreated")
         return binding.root
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -35,18 +38,22 @@ class MenuViewScreen: Fragment() {
     }
 
     private fun launchGameSceneScreen(){
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.container_activity, GameSceneScreen.getInstance(gameSettings))
-            .commit()
+        findNavController()
+            .navigate(MenuViewScreenDirections.actionMenuViewScreenToGameSceneScreen(gameSettings))
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        Log.i("MyTag", "MenuViewScreen onDestroyView")
+    }
+
+    override fun onDestroy() {
+        Log.i("MyTag", "MenuViewScreen onDestroy")
+        super.onDestroy()
     }
 
     companion object{
-        fun getInstance() = MenuViewScreen()
         const val NUMBER_COINS = 100
         const val NUMBER_ROWS = 5
     }

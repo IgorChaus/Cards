@@ -11,9 +11,11 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.math.max
 
-class MainViewModel(gameSettings: GameSettings): ViewModel() {
+class MainViewModel(private val gameSettings: GameSettings): ViewModel() {
 
     private val repository = GameRepositoryImpl()
+
+    private var counter: Int = 0
 
     var itemList: ArrayList<Item> = repository.generateCards(gameSettings.numberColumns) as ArrayList<Item>
 
@@ -21,23 +23,18 @@ class MainViewModel(gameSettings: GameSettings): ViewModel() {
     val item: LiveData<Int>
         get() = _item
 
-    private val _counter: MutableLiveData<Int> = MutableLiveData(0)
-    val counter: LiveData<Int>
-        get() = _counter
+    private val _time: MutableLiveData<String> = MutableLiveData("00:00")
+    val time: LiveData<String>
+        get() = _time
 
     private val _gameResult = MutableLiveData<GameResult>()
     val gameResult: LiveData<GameResult>
         get() = _gameResult
 
-    val coin = MediatorLiveData<Int>().apply {
-        addSource(counter) {
-            value = if (it <= 20){
-                gameSettings.numberCoins
-            } else {
-                max(gameSettings.numberCoins - (it - 20) * 5, 10)
-            }
-        }
-    }
+    private val _coins: MutableLiveData<Int> = MutableLiveData(gameSettings.numberCoins)
+    val coins: LiveData<Int>
+        get() = _coins
+
 
     private var timer: Timer? = null
 
@@ -53,14 +50,24 @@ class MainViewModel(gameSettings: GameSettings): ViewModel() {
         timer = Timer()
         timer?.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                _counter.postValue(counter.value?.plus(1))
+                counter++
+                _time.postValue(formatTime(counter))
+                val numberCoins = if (counter <= 20){
+                    gameSettings.numberCoins
+                } else {
+                    max(gameSettings.numberCoins - (counter - 20) * 5, 10)
+                }
+                _coins.postValue(numberCoins)
+                if (counter == 5999){
+                    _gameResult.value = GameResult(counter, coins.value)
+                }
             }
         }, 1000, 1000)
     }
 
     private fun clearCounter(){
         timer?.cancel()
-        _counter.value = 0
+        _time.value = "00:00"
     }
 
 
@@ -69,38 +76,48 @@ class MainViewModel(gameSettings: GameSettings): ViewModel() {
         timer?.cancel()
     }
 
-    fun checkItem(indexItem: Int) {
+    fun checkItem(currentIndexItem: Int) {
         if (currentItem != null) return
         viewModelScope.launch {
-            currentItem = itemList[indexItem].copy(visibility = true)
-            itemList[indexItem] = currentItem!!
-            _item.value = indexItem
+            currentItem = itemList[currentIndexItem].copy(visibility = true)
+            itemList[currentIndexItem] = currentItem!!
+            _item.value = currentIndexItem
             if (firstPressedIndexItem == null) {
-                firstPressedIndexItem = indexItem
+                firstPressedIndexItem = currentIndexItem
                 currentItem = null
             } else {
-                if (itemList[firstPressedIndexItem!!].image != itemList[indexItem].image) {
+                if (itemList[firstPressedIndexItem!!].image != itemList[currentIndexItem].image) {
                     delay(300)
-                    itemList[indexItem] = currentItem!!.copy(visibility = false)
-                    _item.value = indexItem
+                    itemList[currentIndexItem] = currentItem!!.copy(visibility = false)
+                    _item.value = currentIndexItem
 
                     val firstItem = itemList[firstPressedIndexItem!!]
                     itemList[firstPressedIndexItem!!] = firstItem.copy(visibility = false)
-                    _item.value = firstPressedIndexItem
+                    _item.value = firstPressedIndexItem!!
                 }
                 firstPressedIndexItem = null
                 currentItem = null
-                checkItemsVisibility()
+                checkFinishGame()
             }
         }
     }
 
-    private fun checkItemsVisibility() {
+    private fun formatTime(seconds: Int): String {
+        val minutes = seconds / SECONDS_IN_MINUTES
+        val leftSeconds = seconds - (minutes * SECONDS_IN_MINUTES)
+        return String.format("%02d:%02d", minutes, leftSeconds)
+    }
+
+    private fun checkFinishGame() {
         val hideItem = itemList.find { !it.visibility }
         if (hideItem == null) {
-            _gameResult.value = GameResult(counter.value, coin.value)
+            _gameResult.value = GameResult(counter, coins.value)
             clearCounter()
         }
+    }
+
+    companion object{
+        private const val SECONDS_IN_MINUTES = 60
     }
 
 }
